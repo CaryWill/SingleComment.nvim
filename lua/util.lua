@@ -1,29 +1,3 @@
-function CommentPairs(lines, sr, er, comment)
-  -- if comment string comes is paired
-  -- then comment the start of the block and
-  -- the end of the block
-  -- otherwise comment each line of the block
-  if (lines[sr]:find(comment[1])) then
-    local sl = #comment[1]
-    local el = #comment[2]
-    -- uncomment it
-    local startline = lines[sr]
-    local startlineindent = startline:match("^%s*")
-    local endline = lines[er]
-    lines[sr] = startline:gsub(startlineindent, ""):sub(sl + 1, #lines[sr])
-    lines[er] = lines[er]:sub(1, #endline - el)
-    vim.g.cc = { comment, lines[sr], lines[er], sl, el }
-  else
-    -- comment it
-    lines[sr] =
-        comment[1]
-        .. lines[sr]:gsub("^%s+", "")
-
-    lines[er] = lines[er]
-        .. comment[2]
-  end
-end
-
 function CommentNonPairs(lines, sr, er, comment)
   -- comment each line of the block
   if (lines[sr]:find(commentstr[1])) then
@@ -63,6 +37,13 @@ function SingleLine(lines, sr, er, comment)
         .. trimmed
         .. comment[2]
   end
+  -- cursor in the same line
+  --[[ lines[sr] = lines[sr]:sub(1, sc - 1)
+        .. " "
+        .. comment[1]
+        .. lines[sr]:sub(sc, ec):gsub("^%s+", "")
+        .. comment[2]
+        .. (#lines[sr]:sub(ec + 1) > 0 and " " .. lines[er]:sub(ec + 1) or "") ]]
 end
 
 function reverseString(str)

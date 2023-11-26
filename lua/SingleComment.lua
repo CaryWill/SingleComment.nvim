@@ -6,50 +6,50 @@ local comments = {
   ---@type table lines and filetypes that can be changed to block comments
   -- some can't be changed ;-; but are here for format adjustments
   block = {
-    ["<!--"]        = { "<!-- ", " -->" },
-    ["--[["]        = { "--[[ ", " ]]" },
-    ["-- "]         = { "--[[ ", " ]]" },
-    ["--"]          = { "--[[ ", " ]]" },
-    ["/*"]          = { "/* ",   " */" },
-    lisp            = { "#| ",   " |#" },
-    cmake           = { "#[[ ",  " ]]" },
-    haskell         = { "{- ",   " -}" },
-    elm             = { "{- ",   " -}" },
-    julia           = { "#= ",   " =#" },
-    luau            = { "--[[ ", " ]]" },
-    nim             = { "#[ ",   " ]#" },
-    ocaml           = { "(* ",   " *)" },
-    fsharp          = { "(* ",   " *)" },
-    markdown        = { "<!-- ", " -->" },
-    org             = { "# ",    "" },
-    neorg           = { "# ",    "" },
-    javascript      = { "/* ",   " */" },
-    editorconfig    = { "# ",   "" },
-    fortran         = { "! ",   "" },
-    default         = { "/* ",   " */" },
+    ["<!--"]     = { "<!-- ", " -->" },
+    ["--[["]     = { "--[[ ", " ]]" },
+    ["-- "]      = { "--[[ ", " ]]" },
+    ["--"]       = { "--[[ ", " ]]" },
+    ["/*"]       = { "/* ", " */" },
+    lisp         = { "#| ", " |#" },
+    cmake        = { "#[[ ", " ]]" },
+    haskell      = { "{- ", " -}" },
+    elm          = { "{- ", " -}" },
+    julia        = { "#= ", " =#" },
+    luau         = { "--[[ ", " ]]" },
+    nim          = { "#[ ", " ]#" },
+    ocaml        = { "(* ", " *)" },
+    fsharp       = { "(* ", " *)" },
+    markdown     = { "<!-- ", " -->" },
+    org          = { "# ", "" },
+    neorg        = { "# ", "" },
+    javascript   = { "/* ", " */" },
+    editorconfig = { "# ", "" },
+    fortran      = { "! ", "" },
+    default      = { "/* ", " */" },
   },
   ---@type table blocks and filetypes that can be changed to line comments
   -- some can't be changed ;-; but are here for format adjustments
   line = {
-    ["<!--"]        = { "<!-- ", " -->" },
-    ["/*"]          = { "// ",   "" },
-    ["/* "]         = { "// ",   "" },
-    [";"]           = { "; ",   "" },
-    ["%"]           = { "% ",    "" },
-    ['#']           = { "# ",    "" },
-    nim             = { "# ",    "" },
-    json            = { "// ",   "" },
-    jsonc           = { "// ",   "" },
-    nelua           = { "-- ",   "" },
-    luau            = { "-- ",   "" },
-    ocaml           = { "(* ",   " *)" },
-    css             = { "/* ",   " */" },
-    markdown        = { "<!-- ", " -->" },
-    org             = { "# ",    "" },
-    neorg           = { "# ",    "" },
-    editorconfig    = { "# ",   "" },
-    fortran         = { "! ",   "" },
-    default         = { "// ",   "" },
+    ["<!--"]     = { "<!-- ", " -->" },
+    ["/*"]       = { "// ", "" },
+    ["/* "]      = { "// ", "" },
+    [";"]        = { "; ", "" },
+    ["%"]        = { "% ", "" },
+    ['#']        = { "# ", "" },
+    nim          = { "# ", "" },
+    json         = { "// ", "" },
+    jsonc        = { "// ", "" },
+    nelua        = { "-- ", "" },
+    luau         = { "-- ", "" },
+    ocaml        = { "(* ", " *)" },
+    css          = { "/* ", " */" },
+    markdown     = { "<!-- ", " -->" },
+    org          = { "# ", "" },
+    neorg        = { "# ", "" },
+    editorconfig = { "# ", "" },
+    fortran      = { "! ", "" },
+    default      = { "// ", "" },
   },
 }
 
@@ -111,9 +111,9 @@ function M.ToggleCommentAhead()
   local feedlines = ""
 
   if
-    lines[b]
-    and lines[c]:find("^%s*" .. comment)
-    and not (lines[b]:match(comment) or lines[b]:match("^%s*$"))
+      lines[b]
+      and lines[c]:find("^%s*" .. comment)
+      and not (lines[b]:match(comment) or lines[b]:match("^%s*$"))
   then
     -- move current line comment ahead of bottom line
     lines[c] = lines[b] .. " " .. lines[c]:match("^%s*(.*)")
@@ -125,9 +125,9 @@ function M.ToggleCommentAhead()
     lines[c + 1] = text
     feedlines = "==zv"
   elseif
-    lines[t]
-    and lines[t]:find("^%s*" .. comment)
-    and not (lines[c]:find(comment) or lines[c]:match("^%s*$"))
+      lines[t]
+      and lines[t]:find("^%s*" .. comment)
+      and not (lines[c]:find(comment) or lines[c]:match("^%s*$"))
   then
     -- move top line comment ahead of current line
     lines[c] = lines[c] .. " " .. lines[t]:match(comment .. ".*")
@@ -218,7 +218,7 @@ function M.Comment()
 
       -- uncomment only when all the lines are commented
       if
-        uncomment == nil and not lines[i]:match("^%s*" .. vim.pesc(comment[1]))
+          uncomment == nil and not lines[i]:match("^%s*" .. vim.pesc(comment[1]))
       then
         uncomment = true
       end
@@ -232,8 +232,8 @@ function M.Comment()
 
       if not uncomment then
         lines[i] = lines[i]
-          :gsub("^" .. vim.pesc(comment[1]), indent)
-          :gsub(vim.pesc(comment[2]) .. "$", "")
+            :gsub("^" .. vim.pesc(comment[1]), indent)
+            :gsub(vim.pesc(comment[2]) .. "$", "")
       else
         lines[i] = indent .. comment[1] .. lines[i] .. comment[2]
       end
@@ -253,64 +253,43 @@ function M.BlockComment()
   local _, er, ec, _ = unpack(vim.fn.getpos("v"))
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
-  if mode == "v" or mode == "V" or mode == "CTRL-V" then
-    -- keep start/end in the right place in reverse selection
-    if sr > er then
-      sr, er = er, sr
-      sc, ec = ec, sc
-    end
+  -- keep start/end in the right place in reverse selection
+  if sr > er then
+    sr, er = er, sr
+    sc, ec = ec, sc
+  end
 
-    -- get all the line in visual line mode
-    if mode == "V" then
-      sc, ec = 1, 999
-    end
-
-    if sr == er then
-      -- cursor in the same line
-      -- in case of reversed column
-      if sc > ec then
-        sc, ec = ec, sc
-      end
-
-      lines[sr] = lines[sr]:sub(1, sc - 1)
-        .. " "
-        .. comment[1]
-        .. lines[sr]:sub(sc, ec):gsub("^%s+", "")
-        .. comment[2]
-        .. (#lines[sr]:sub(ec + 1) > 0 and " " .. lines[er]:sub(ec + 1) or "")
-    else
-      -- cursor in separate lines
-      lines[sr] = lines[sr]:sub(1, sc - 1)
-        .. " "
-        .. comment[1]
-        .. lines[sr]:sub(sc):gsub("^%s+", "")
-
-      lines[er] = lines[er]:sub(1, ec)
-        .. comment[2]
-        .. (#lines[er]:sub(ec + 1) > 0 and " " .. lines[er]:sub(ec + 1) or "")
-    end
-
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-    vim.api.nvim_feedkeys("=", "n", false)
+  if sr == er then
+    M.SingleLine(lines, sr, er, comment)
   else
-    -- uncomment innermost comment
-    comment = { vim.pesc(comment[1]), vim.pesc(comment[2]) }
+    -- cursor in separate lines
+    M.CommentPairs()
+  end
 
-    for i = sr, 1, -1 do
-      if lines[i]:find(comment[1]) then
-        lines[i] = lines[i]:gsub("^(%s*)" .. comment[1], "%1")
-        lines[i] = lines[i]:gsub("%s" .. comment[1], "")
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+  vim.api.nvim_feedkeys("=", "n", false)
+end
 
-        for j = sr, #lines do
-          if lines[j]:find(comment[2]) then
-            lines[j] = lines[j]:gsub(comment[2] .. "%s?", "")
+function M.CommentPairs(lines, sr, er, commentstr)
+  -- if comment string comes is paired
+  -- then comment the start of the block and
+  -- the end of the block
+  -- otherwise comment each line of the block
+  if (lines[sr]:find(comment[1])) then
+    comment = { vim.pesc(commentstr[1]), vim.pesc(commentstr[2]) }
 
-            vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-            return
-          end
-        end
-      end
-    end
+    -- uncomment it
+    lines[sr] = lines[sr]:gsub("^(%s*)" .. comment[1], "%1")
+    lines[sr] = lines[sr]:gsub("%s" .. comment[1], "")
+    lines[er] = lines[er]:gsub(comment[2] .. "%s?", "")
+  else
+    -- comment it
+    lines[sr] =
+        comment[1]
+        .. lines[sr]:gsub("^%s+", "")
+
+    lines[er] = lines[er]
+        .. comment[2]
   end
 end
 
