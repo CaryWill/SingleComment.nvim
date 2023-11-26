@@ -3,6 +3,8 @@
 1. comment jsx when more than 1 line is selected no matter where the cursor is
 2. auto switch comment mode, Comment and BlockComment, unified into one
 3. can not print lua message when selecting multi-lines in visiual mode
+4. need test lua multi-lines
+5. 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
 
 # SingleComment.nvim
 
