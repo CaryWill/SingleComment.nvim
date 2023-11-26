@@ -5,6 +5,7 @@
 3. can not print lua message when selecting multi-lines in visiual mode
 4. need test lua multi-lines
 5. 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
+6. see if i can unify just using original repo
 
 # SingleComment.nvim
 
