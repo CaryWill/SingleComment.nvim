@@ -1,3 +1,9 @@
+# Goal
+
+1. comment jsx when more than 1 line is selected no matter where the cursor is
+2. auto switch comment mode, Comment and BlockComment, unified into one
+3. can not print lua message when selecting multi-lines in visiual mode
+
 # SingleComment.nvim
 
 Always single line, comment sensitive, indentation preserving commenting.
