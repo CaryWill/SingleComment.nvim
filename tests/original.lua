@@ -98,85 +98,26 @@ function M.GetComment(kind)
   return comment
 end
 
---- toggle a comment top/ahead of the current line
-function M.ToggleCommentAhead()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local winnr = vim.api.nvim_get_current_win()
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  local comment = vim.pesc(M.GetComment()[1])
-  local col = vim.fn.col(".") - 1
-  local c = vim.fn.line(".")
-  local t = c - 1
-  local b = c + 1
-  local feedlines = ""
+function M.SingleLine(lines, sr, er, comment)
+  local indent = lines[sr]:match("^%s*")
+  local trimmed = lines[sr]:sub(#indent, #lines[sr])
 
-  if
-      lines[b]
-      and lines[c]:find("^%s*" .. comment)
-      and not (lines[b]:match(comment) or lines[b]:match("^%s*$"))
-  then
-    -- move current line comment ahead of bottom line
-    lines[c] = lines[b] .. " " .. lines[c]:match("^%s*(.*)")
-    table.remove(lines, b)
-  elseif lines[c]:find("%S+%s+" .. comment) then
-    -- move comment ahead of current line to a new line on top
-    local text, comment_text = lines[c]:match("(.*) (" .. comment .. ".*)")
-    table.insert(lines, c, comment_text)
-    lines[c + 1] = text
-    feedlines = "==zv"
-  elseif
-      lines[t]
-      and lines[t]:find("^%s*" .. comment)
-      and not (lines[c]:find(comment) or lines[c]:match("^%s*$"))
-  then
-    -- move top line comment ahead of current line
-    lines[c] = lines[c] .. " " .. lines[t]:match(comment .. ".*")
-    table.remove(lines, t)
-    c = c - 1
-  end
+  commentstr = { vim.pesc(comment[1]), vim.pesc(comment[2]) }
+  local matchStart = trimmed:find("^" .. comment[1])
+  local matchEnd = lines[sr]:find(comment[2] .. "$")
 
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.api.nvim_win_set_cursor(winnr, { c, col })
-  vim.api.nvim_feedkeys(feedlines, "n", false)
-end
-
---- inserts a comment at the end of the current line
-function M.CommentAhead()
-  local comment = M.GetComment()
-  local line = vim.api.nvim_get_current_line()
-  -- position the cursor in insert mode
-  local position = vim.api.nvim_replace_termcodes(
-    string.rep("<left>", #comment[2]),
-    true,
-    false,
-    true
-  )
-
-  if line:match("^%s*$") then
-    -- comment on empty/only-space line
-    vim.api.nvim_feedkeys(
-      "S" .. comment[1] .. comment[2] .. position,
-      "n",
-      false
-    )
+  -- commented
+  if matchStart and matchEnd then
+    lines[sr] = lines[sr]:gsub(comment[1], ""):gsub(comment[2], "")
   else
-    -- comment in ahead of the line
-    vim.api.nvim_feedkeys(
-      "A " .. comment[1] .. comment[2] .. position,
-      "n",
-      false
-    )
+    lines[sr] =
+        indent
+        .. comment[1]
+        .. trimmed
+        .. comment[2]
   end
 end
 
--- handles dotrepeat when commenting which does not work with visual mode
--- for visual comments use require'SingleComment'.Comment()
-function M.SingleComment()
-  vim.go.operatorfunc = "v:lua.require'SingleComment'.Comment"
-  return "g@l"
-end
-
---- comments single lines whenever possible
 function M.Comment()
   local bufnr = vim.api.nvim_get_current_buf()
   local winnr = vim.api.nvim_get_current_win()
@@ -245,9 +186,30 @@ function M.Comment()
   vim.api.nvim_win_set_cursor(winnr, { sr, col })
 end
 
+function M.CommentNonPairs(lines, sr, er, comment)
+  -- comment each line of the block
+  if (lines[sr]:find(commentstr[1])) then
+    -- uncomment it
+    for i = sr, er do
+      lines[i] = lines[i]:gsub(comment[1], "")
+    end
+  else
+    -- comment it
+    -- keep indent
+    for i = sr, er do
+      local indent = lines[i]:match("^%s*")
+      local trimmed = lines[i]:gsub(indent, "")
+
+      lines[i] =
+          indent
+          .. comment[1]
+          .. trimmed
+    end
+  end
+end
+
 function M.BlockComment()
   local bufnr = vim.api.nvim_get_current_buf()
-  local mode = vim.api.nvim_get_mode()["mode"]
   local comment = M.GetComment("block")
   local _, sr, sc, _ = unpack(vim.fn.getpos("."))
   local _, er, ec, _ = unpack(vim.fn.getpos("v"))
@@ -263,7 +225,11 @@ function M.BlockComment()
     M.SingleLine(lines, sr, er, comment)
   else
     -- cursor in separate lines
-    M.CommentPairs()
+    if (comment[2] == "") then
+      M.CommentNonPairs(lines, sr, er, comment)
+    else
+      M.CommentPairs(lines, sr, er, comment)
+    end
   end
 
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
