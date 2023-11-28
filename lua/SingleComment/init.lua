@@ -99,26 +99,6 @@ function M.GetComment(kind)
   return comment
 end
 
-function M.SingleLine(lines, sr, er, comment)
-  local indent = lines[sr]:match("^%s*")
-  local trimmed = lines[sr]:sub(#indent, #lines[sr])
-
-  commentstr = { vim.pesc(comment[1]), vim.pesc(comment[2]) }
-  local matchStart = trimmed:find("^" .. comment[1])
-  local matchEnd = lines[sr]:find(comment[2] .. "$")
-
-  -- commented
-  if matchStart and matchEnd then
-    lines[sr] = lines[sr]:gsub(comment[1], ""):gsub(comment[2], "")
-  else
-    lines[sr] =
-        indent
-        .. comment[1]
-        .. trimmed
-        .. comment[2]
-  end
-end
-
 function M.BlockComment()
   local bufnr = vim.api.nvim_get_current_buf()
   local comment = M.GetComment("block")
@@ -132,13 +112,12 @@ function M.BlockComment()
     sc, ec = ec, sc
   end
 
+  lines = M.CommentPairs(lines, sr, er, comment)
   if sr == er then
-    M.SingleLine(lines, sr, er, comment)
   else
-    M.CommentPairs(lines, sr, er, comment)
   end
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.api.nvim_feedkeys("=", "n", false)
+  --  vim.api.nvim_feedkeys("=", "n", false)
 end
 
 function M.CommentPairs(lines, sr, er, commentstr)
@@ -146,15 +125,16 @@ function M.CommentPairs(lines, sr, er, commentstr)
   -- then comment the start of the block and
   -- the end of the block
   -- otherwise comment each line of the block
-  local all_lines = table.pack(table.unpack(lines, sr, er))
   local comment = { vim.pesc(commentstr[1]), vim.pesc(commentstr[2]) }
   if (lines[sr]:find(comment[1])) then
     -- uncomment it
-    Util.remove_comment_multiline(all_lines, comment[1], comment[2])
+    Util.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
   else
     -- comment it
-    Util.insert_comment_multiline(all_lines, comment[1], comment[2])
+    Util.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
   end
+
+  return lines
 end
 
 return M

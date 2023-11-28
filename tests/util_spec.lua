@@ -1,6 +1,21 @@
 local scm = require "SingleComment.util"
 
 describe("comment contains magic chars", function()
+  it("table index from 1", function()
+    local mutli_lines = {
+      "     const str = 123;",
+      "     const str2 = 123;",
+      "     const str3 = 123;"
+    }
+    assert.equals(mutli_lines[1], "     const str = 123;")
+  end)
+
+  it("substring", function()
+    local str = "     const str = 123;"
+    assert.equals(str:sub(3, #str), "   const str = 123;")
+  end)
+
+
   -- leftpad 5 spaces
   local original_str = "     const str = 123;"
   local left_comment = "{/*"
@@ -33,29 +48,29 @@ describe("comment contains magic chars", function()
     local mutli_lines_modified = {
       "     {/*const str = 123;",
       "        const str2 = 123;",
-      "        const str3 = 123;/*}"
+      "        const str3 = 123;*/}"
     }
-    local result = scm.insert_comment_multiline(mutli_lines, left_comment, right_comment)
-    assert.equals(result[0], mutli_lines_modified[0])
-    assert.equals(result[1], mutli_lines_modified[1])
-    assert.equals(result[2], mutli_lines_modified[2])
+    local result = scm.insert_comment_multiline(mutli_lines, 1, #mutli_lines, left_comment, right_comment)
+    assert.equals(mutli_lines_modified[1], result[1])
+    assert.equals(mutli_lines_modified[2], result[2])
+    assert.equals(mutli_lines_modified[3], result[3])
   end)
 
   it("remove in multi-lines", function()
     local mutli_lines = {
       "     {/*const str = 123;",
       "        const str2 = 123;",
-      "        const str3 = 123;/*}"
+      "        const str3 = 123;*/}"
     }
     local mutli_lines_modified = {
       "     const str = 123;",
       "     const str2 = 123;",
       "     const str3 = 123;"
     }
-    local result = scm.remove_comment_multiline(mutli_lines, left_comment, right_comment)
-    assert.equals(result[0], mutli_lines_modified[0])
-    assert.equals(result[1], mutli_lines_modified[1])
-    assert.equals(result[2], mutli_lines_modified[2])
+    local result = scm.remove_comment_multiline(mutli_lines, 1, #mutli_lines, left_comment, right_comment)
+    assert.equals(mutli_lines_modified[1], result[1])
+    assert.equals(mutli_lines_modified[2], result[2])
+    assert.equals(mutli_lines_modified[3], result[3])
   end)
 end)
 
