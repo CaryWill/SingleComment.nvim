@@ -11,9 +11,9 @@ class App extends Component {
     return (
       <div>
         <span>123</span>
-        {/*<span>123</span> 
-        <span>123</span>
-        <span>123</span>*/}
+        {/* <span>123</span>
+            <span>123</span>
+            <span>123</span> */}
       </div>
     );
   }

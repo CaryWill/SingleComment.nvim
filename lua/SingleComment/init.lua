@@ -63,12 +63,10 @@ function M.GetComment(kind)
   local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
 
   local ok, tsc = pcall(require, "ts_context_commentstring.internal")
-
+  local cs = ""
   if ok then
     tsc.update_commentstring({})
   end
-
-  local cs = vim.api.nvim_buf_get_option(bufnr, "commentstring")
 
   if comments[kind][filetype] ~= nil then
     -- use [filetype] override
@@ -77,6 +75,7 @@ function M.GetComment(kind)
     -- use [default] comment for [kind]
     comment = comments[kind]["default"]
   else
+    vim.g.a = cs
     -- separating strings like `%%s` like tex comments
     -- does not work well in a for loop with gmatch
     comment[1] = cs:match("(.*)%%s")
@@ -96,13 +95,16 @@ function M.GetComment(kind)
     end
   end
 
+  vim.g.c = { comment, cs }
   return comment
 end
 
+-- TODO: 我看 comment str 拿不准的原因可能是 visual mode
+-- 之后鼠标的位置导致调用的 ts_context_commentstring 的函数的
+-- 时机不一致
 function M.BlockComment()
   local bufnr = vim.api.nvim_get_current_buf()
   local comment = M.GetComment("block")
-  P(comment)
   local _, sr, sc, _ = unpack(vim.fn.getpos("."))
   local _, er, ec, _ = unpack(vim.fn.getpos("v"))
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -114,9 +116,11 @@ function M.BlockComment()
   end
 
   lines = M.CommentPairs(lines, sr, er, comment)
+
   if sr == er then
   else
   end
+
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
   --  vim.api.nvim_feedkeys("=", "n", false)
 end
@@ -128,10 +132,10 @@ function M.CommentPairs(lines, sr, er, comment)
   -- otherwise comment each line of the block
   if (lines[sr]:find(vim.pesc(comment[1]))) then
     -- uncomment it
-    Util.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
+    --Util.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
   else
     -- comment it
-    Util.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
+    --Util.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
   end
 
   return lines
