@@ -119,74 +119,6 @@ function M.SingleLine(lines, sr, er, comment)
   end
 end
 
-function M.Comment()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local winnr = vim.api.nvim_get_current_win()
-  local comment = M.GetComment()
-  local count = vim.v.count
-  local col = vim.fn.col(".") - 1
-  local sr, er = vim.fn.line("v"), vim.fn.line(".")
-
-  -- in case the selection starts from the bottom
-  if sr > er then
-    sr, er = er, sr
-  end
-
-  -- account for counts
-  if count ~= 0 then
-    er = er + count - 1
-  end
-
-  local lines = vim.api.nvim_buf_get_lines(bufnr, sr - 1, er, false)
-
-  if #lines == 1 and (lines[1] == nil or lines[1] == "") then
-    --- comment when used in a single empty line
-    M.CommentAhead()
-    return
-  end
-
-  --- comment when used in multiple lines
-  local indent = lines[1]:match("^%s*")
-  local tmpindent, uncomment
-
-  -- check indentation and comment state of all lines for use later
-  for i, _ in ipairs(lines) do
-    if not lines[i]:match("^%s*$") then
-      -- gets the shallowest comment indentation for commenting
-      tmpindent = lines[i]:match("^%s*")
-      if #indent > #tmpindent then
-        indent = tmpindent
-      end
-
-      -- uncomment only when all the lines are commented
-      if
-          uncomment == nil and not lines[i]:match("^%s*" .. vim.pesc(comment[1]))
-      then
-        uncomment = true
-      end
-    end
-  end
-
-  -- comment or uncomment all lines
-  for i, _ in ipairs(lines) do
-    if not lines[i]:match("^%s*$") then
-      lines[i] = lines[i]:gsub("^" .. indent, "")
-
-      if not uncomment then
-        lines[i] = lines[i]
-            :gsub("^" .. vim.pesc(comment[1]), indent)
-            :gsub(vim.pesc(comment[2]) .. "$", "")
-      else
-        lines[i] = indent .. comment[1] .. lines[i] .. comment[2]
-      end
-    end
-  end
-
-  vim.api.nvim_buf_set_lines(bufnr, sr - 1, er, false, lines)
-  vim.api.nvim_input("<esc>")
-  vim.api.nvim_win_set_cursor(winnr, { sr, col })
-end
-
 function M.BlockComment()
   local bufnr = vim.api.nvim_get_current_buf()
   local comment = M.GetComment("block")
@@ -205,7 +137,6 @@ function M.BlockComment()
   else
     M.CommentPairs(lines, sr, er, comment)
   end
-
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
   vim.api.nvim_feedkeys("=", "n", false)
 end
