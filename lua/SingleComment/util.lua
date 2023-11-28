@@ -27,6 +27,9 @@ function M.remove_from_end(str, chars)
 end
 
 -- syntax sugar 🍬
+-- left_chars & right_comment should be unescaped chars
+-- TODO: add notes
+-- TODO: right_comment
 function M.insert_comment_multiline(lines, left_chars, right_comment)
   local indent = string.rep(" ", #left_chars)
   for i = 1, #lines do

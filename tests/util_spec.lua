@@ -35,7 +35,7 @@ describe("comment contains magic chars", function()
       "        const str2 = 123;",
       "        const str3 = 123;/*}"
     }
-    local result = scm.insert_at_start_multiline(mutli_lines, left_comment, right_comment)
+    local result = scm.insert_comment_multiline(mutli_lines, left_comment, right_comment)
     assert.equals(result[0], mutli_lines_modified[0])
     assert.equals(result[1], mutli_lines_modified[1])
     assert.equals(result[2], mutli_lines_modified[2])
@@ -52,7 +52,7 @@ describe("comment contains magic chars", function()
       "     const str2 = 123;",
       "     const str3 = 123;"
     }
-    local result = scm.remove_from_end_multiline(mutli_lines, left_comment, right_comment)
+    local result = scm.remove_comment_multiline(mutli_lines, left_comment, right_comment)
     assert.equals(result[0], mutli_lines_modified[0])
     assert.equals(result[1], mutli_lines_modified[1])
     assert.equals(result[2], mutli_lines_modified[2])
