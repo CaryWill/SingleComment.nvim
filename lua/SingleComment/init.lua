@@ -102,6 +102,7 @@ end
 function M.BlockComment()
   local bufnr = vim.api.nvim_get_current_buf()
   local comment = M.GetComment("block")
+  P(comment)
   local _, sr, sc, _ = unpack(vim.fn.getpos("."))
   local _, er, ec, _ = unpack(vim.fn.getpos("v"))
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -120,13 +121,12 @@ function M.BlockComment()
   --  vim.api.nvim_feedkeys("=", "n", false)
 end
 
-function M.CommentPairs(lines, sr, er, commentstr)
+function M.CommentPairs(lines, sr, er, comment)
   -- if comment string comes is paired
   -- then comment the start of the block and
   -- the end of the block
   -- otherwise comment each line of the block
-  local comment = { vim.pesc(commentstr[1]), vim.pesc(commentstr[2]) }
-  if (lines[sr]:find(comment[1])) then
+  if (lines[sr]:find(vim.pesc(comment[1]))) then
     -- uncomment it
     Util.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
   else

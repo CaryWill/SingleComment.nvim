@@ -2,6 +2,7 @@ local M = {}
 
 -- default keep indent
 function M.insert_at_start(str, chars)
+  vim.g.chars = chars
   local indent = str:match("^%s*")
   local unindented = str:sub(#indent + 1, #str)
   local result = indent .. chars .. unindented
@@ -40,14 +41,12 @@ function M.insert_comment_multiline(lines, sr, er, left_chars, right_chars)
   if er == nil then er = #lines end
 
   local indent = string.rep(" ", #left_chars)
-  for i = 1, #lines do
-    if i < sr or i > er then
-      -- do nothing
-    elseif i == 1 then
+  for i = sr, er do
+    if i == sr then
       -- comment only on first line
       lines[i] = M.insert_at_start(lines[i], left_chars)
       -- keep indent
-    elseif i == #lines then
+    elseif i == er then
       lines[i] = M.insert_at_end(lines[i], right_chars, true, indent)
     else
       lines[i] = indent .. lines[i]
@@ -60,12 +59,10 @@ function M.remove_comment_multiline(lines, sr, er, left_chars, right_chars)
   if sr == nil then sr = 1 end
   if er == nil then er = #lines end
 
-  for i = 1, #lines do
-    if i < sr or i > er then
-      -- do nothing
-    elseif i == 1 then
+  for i = sr, er do
+    if i == sr then
       lines[i] = M.remove_from_start(lines[i], left_chars)
-    elseif i == #lines then
+    elseif i == er then
       lines[i] = M.remove_from_end(lines[i], right_chars)
       -- restore indent
       lines[i] = lines[i]:sub(#left_chars + 1, #lines[i])
