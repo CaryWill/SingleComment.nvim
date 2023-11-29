@@ -1,18 +1,18 @@
 local Util = require "SingleComment.util"
 
-local MiniComment = {}
+local M = {}
 local H = {}
 
-MiniComment.setup = function()
-  _G.MiniComment = MiniComment
+M.setup = function()
+  _G.MiniComment = M
 
-  vim.keymap.set("n", "gc", function() return MiniComment.operator() end, { expr = true })
+  vim.keymap.set("n", "gc", function() return M.operator() end, { expr = true })
   -- Using `:<c-u>` instead of `<cmd>` as latter results into executing before
   -- proper update of `'<` and `'>` marks which is needed to work correctly.
   vim.keymap.set("x", "gc", [[:<c-u>lua MiniComment.operator('visual')<cr>]], {})
 end
 
-MiniComment.config = {
+M.config = {
   options = {
     custom_commentstring = function()
       return require('ts_context_commentstring').calculate_commentstring() or vim.bo.commentstring
@@ -26,7 +26,7 @@ MiniComment.config = {
   },
 }
 
-MiniComment.operator = function(mode)
+M.operator = function(mode)
   local mark_left, mark_right = '[', ']'
   if mode == 'visual' then
     mark_left, mark_right = '<', '>'
@@ -43,48 +43,30 @@ MiniComment.operator = function(mode)
   -- tree-sitter-based 'commentstring'. Compute them inside command for
   -- a proper dot-repeat. For Visual mode and sometimes Normal mode it uses
   -- left position.
-    [[lockmarks lua MiniComment.toggle_lines(%d, %d, { ref_position = { vim.fn.line('.'), vim.fn.col('.') } })]],
+    [[lockmarks lua MiniComment.toggle_lines(%d, %d)]],
     line_left,
     line_right
   ))
   return ''
 end
 
-MiniComment.toggle_lines = function(line_start, line_end, opts)
-  opts = opts or {}
-  local ref_position = opts.ref_position or { line_start, 1 }
-
-  local n_lines = vim.api.nvim_buf_line_count(0)
-  if not (1 <= line_start and line_start <= n_lines and 1 <= line_end and line_end <= n_lines) then
-    error(('(mini.comment) `line_start` and `line_end` should be within range [1; %s].'):format(n_lines))
-  end
-  if not (line_start <= line_end) then
-    error('(mini.comment) `line_start` should be less than or equal to `line_end`.')
-  end
-
-  local comment_parts = H.make_comment_parts(ref_position)
+M.toggle_lines = function(line_start, line_end)
+  local comment_parts = M.make_comment_parts()
+  -- format only on selected lines
   local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
-
   -- core
   Util.toggle_comment(lines, 1, #lines, { comment_parts.left, comment_parts.right })
-
-  -- NOTE: This function call removes marks inside written range. To write
-  -- lines in a way that saves marks, use one of:
-  -- - `lockmarks` command when doing mapping (current approach).
-  -- - `vim.fn.setline(line_start, lines)`, but this is **considerably**
-  --   slower: on 10000 lines 280ms compared to 40ms currently.
   vim.api.nvim_buf_set_lines(0, line_start - 1, line_end, false, lines)
 end
 
 H.get_config = function(config)
-  return vim.tbl_deep_extend('force', MiniComment.config, vim.b.minicomment_config or {}, config or {})
+  return vim.tbl_deep_extend('force', M.config, vim.b.minicomment_config or {}, config or {})
 end
 
--- Core implementations --
-H.make_comment_parts = function(ref_position)
+M.make_comment_parts = function()
   local options = H.get_config().options
 
-  local cs = options.custom_commentstring(ref_position)
+  local cs = options.custom_commentstring()
 
   -- Assumed structure of 'commentstring':
   -- <space> <left> <'%s'> <right> <space>
@@ -100,4 +82,4 @@ end
 -- Utilities --
 H.error = function(msg) error(string.format('(mini.comment) %s', msg), 0) end
 
-return MiniComment
+return M
