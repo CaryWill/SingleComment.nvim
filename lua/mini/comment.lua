@@ -4,7 +4,7 @@ local M = {}
 M.setup = function()
   _G.__MiniComment = M
 
-  vim.keymap.set("n", "gc", function() return M.operator() .. '_' end, { expr = true })
+  vim.keymap.set("n", "gcc", function() return M.operator() .. '_' end, { expr = true })
   -- Using `:<c-u>` instead of `<cmd>` as latter results into executing before
   -- proper update of `'<` and `'>` marks which is needed to work correctly.
   vim.keymap.set("x", "gc", [[:<c-u>lua __MiniComment.operator('visual')<cr>]], {})
