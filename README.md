@@ -59,6 +59,21 @@ instead of this,
 Since i cannot found out why i cannot get the right comment string using ts_comment_string plugin,
 I just copied this part of logic from mini.comment plugin.
 
+## Test case
+
+### back compatibale
+
+if it's already formated like this, then comment on each line, since most plugins are using this kind of style
+
+```jsx
+      <div>
+        <span>123</span>
+        {/*<span>123</span>*/}
+        {/*<span>123</span>*/}
+        {/*<span>123</span>*/}
+      </div>
+```
+
 ## Goal
 
 - [x] comment jsx when more than 1 line is selected no matter where the cursor is
