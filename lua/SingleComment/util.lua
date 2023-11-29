@@ -82,4 +82,15 @@ function M.tableSubsetByRange(originalTable, a, b)
   return subset
 end
 
+function M.toggle_comment(lines, sr, er, comment)
+  if (lines[sr]:find(vim.pesc(comment[1]))) then
+    -- uncomment it
+    M.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
+  else
+    -- comment it
+    M.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
+  end
+  return lines
+end
+
 return M

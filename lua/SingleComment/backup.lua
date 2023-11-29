@@ -125,20 +125,4 @@ function M.BlockComment()
   --  vim.api.nvim_feedkeys("=", "n", false)
 end
 
-function M.CommentPairs(lines, sr, er, comment)
-  -- if comment string comes is paired
-  -- then comment the start of the block and
-  -- the end of the block
-  -- otherwise comment each line of the block
-  if (lines[sr]:find(vim.pesc(comment[1]))) then
-    -- uncomment it
-    --Util.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
-  else
-    -- comment it
-    --Util.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
-  end
-
-  return lines
-end
-
 return M
