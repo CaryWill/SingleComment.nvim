@@ -1,3 +1,4 @@
+local Util = require "SingleComment.util"
 --- *mini.comment* Comment lines
 --- *MiniComment*
 ---
@@ -242,18 +243,11 @@ MiniComment.toggle_lines = function(line_start, line_end, opts)
 
   local comment_parts = H.make_comment_parts(ref_position)
   local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
-  local indent, is_comment = H.get_lines_info(lines, comment_parts, H.get_config().options)
 
-  local f
-  if is_comment then
-    f = H.make_uncomment_function(comment_parts)
-  else
-    f = H.make_comment_function(comment_parts, indent)
-  end
+  vim.g.l = { lines, line_start, line_end, comment_parts }
 
-  for n, l in pairs(lines) do
-    lines[n] = f(l)
-  end
+  -- core
+  Util.toggle_comment(lines, 1, #lines, { comment_parts.left, comment_parts.right })
 
   -- NOTE: This function call removes marks inside written range. To write
   -- lines in a way that saves marks, use one of:
@@ -524,6 +518,7 @@ H.make_comment_function = function(comment_parts, indent)
 end
 
 H.make_uncomment_function = function(comment_parts)
+  vim.g.c = comment_parts
   local options = H.get_config().options
 
   local l, r = comment_parts.left, comment_parts.right

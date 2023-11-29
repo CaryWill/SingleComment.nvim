@@ -1,73 +1,80 @@
 local M = {}
 
 -- default keep indent
-function M.insert_at_start(str, chars)
-  vim.g.chars = chars
+function M.insert_at_start(str, unescaped_chars)
+  vim.g.chars = unescaped_chars
   local indent = str:match("^%s*")
   local unindented = str:sub(#indent + 1, #str)
-  local result = indent .. chars .. unindented
+  local result = indent .. unescaped_chars .. unindented
   return result
 end
 
 -- default not keep indent
-function M.insert_at_end(str, chars, keep_indent, left_padding)
+function M.insert_at_end(str, unescaped_chars, keep_indent, left_padding)
   if keep_indent then
-    return left_padding .. str .. chars
+    return left_padding .. str .. unescaped_chars
   else
-    return str .. chars
+    return str .. unescaped_chars
   end
 end
 
-function M.remove_from_start(str, chars)
+function M.remove_from_start(str, unescaped_chars)
   local indent = str:match("^%s*")
-  local escaped_chars = vim.pesc(chars)
+  local escaped_chars = vim.pesc(unescaped_chars)
   return str:gsub(indent .. escaped_chars, indent)
 end
 
-function M.remove_from_end(str, chars)
-  local escaped_chars = vim.pesc(chars)
+function M.remove_from_end(str, unescaped_chars)
+  local escaped_chars = vim.pesc(unescaped_chars)
   if not str:find(escaped_chars .. "$") then
     return str
   end
-  return str:sub(1, #str - #chars)
+  return str:sub(1, #str - #unescaped_chars)
 end
 
 -- syntax sugar 🍬
--- left_chars & right_comment should be unescaped chars
--- TODO: add notes
--- TODO: right_comment
-function M.insert_comment_multiline(lines, sr, er, left_chars, right_chars)
+-- 1. if both left_chars & right_chars exists then only comment on first and last line
+-- 2. if right_chars are missing then comment on each line
+function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescaped_right_chars)
   if sr == nil then sr = 1 end
   if er == nil then er = #lines end
 
-  local indent = string.rep(" ", #left_chars)
-  for i = sr, er do
-    if i == sr then
-      -- comment only on first line
-      lines[i] = M.insert_at_start(lines[i], left_chars)
-      -- keep indent
-    elseif i == er then
-      lines[i] = M.insert_at_end(lines[i], right_chars, true, indent)
-    else
-      lines[i] = indent .. lines[i]
+  if unescaped_left_chars and unescaped_right_chars ~= "" then
+    local indent = string.rep(" ", #unescaped_left_chars)
+    for i = sr, er do
+      if i == sr then
+        -- comment only on first line
+        lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
+        -- keep indent
+      elseif i == er then
+        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars, true, indent)
+      else
+        lines[i] = indent .. lines[i]
+      end
+    end
+  else
+    -- comment on each line when right_chars are missing
+    for i = sr, er do
+      lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
     end
   end
+
   return lines
 end
 
-function M.remove_comment_multiline(lines, sr, er, left_chars, right_chars)
+function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescaped_right_chars)
   if sr == nil then sr = 1 end
   if er == nil then er = #lines end
 
   for i = sr, er do
     if i == sr then
-      lines[i] = M.remove_from_start(lines[i], left_chars)
+      lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
     elseif i == er then
-      lines[i] = M.remove_from_end(lines[i], right_chars)
+      lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
       -- restore indent
-      lines[i] = lines[i]:sub(#left_chars + 1, #lines[i])
+      lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
     else
-      lines[i] = lines[i]:sub(#left_chars + 1, #lines[i])
+      lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
     end
   end
 
