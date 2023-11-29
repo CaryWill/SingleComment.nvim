@@ -4,13 +4,19 @@ local M = {}
 M.setup = function()
   _G.__MiniComment = M
 
-  vim.keymap.set("n", "gc", function() return M.toggle_lines() end, { expr = true })
+  vim.keymap.set("n", "gc", function() return M.operator() .. '_' end, { expr = true })
   -- Using `:<c-u>` instead of `<cmd>` as latter results into executing before
   -- proper update of `'<` and `'>` marks which is needed to work correctly.
   vim.keymap.set("x", "gc", [[:<c-u>lua __MiniComment.operator('visual')<cr>]], {})
 end
 
 M.operator = function(mode)
+  -- single line comment
+  if mode == nil then
+    vim.o.operatorfunc = 'v:lua.__MiniComment.operator'
+    return 'g@'
+  end
+
   local mark_left, mark_right = '[', ']'
   if mode == 'visual' then
     mark_left, mark_right = '<', '>'
@@ -32,15 +38,13 @@ end
 M.toggle_lines = function(line_start, line_end)
   local bufnr = vim.api.nvim_get_current_buf()
   if line_start == nil and line_end == nil then
-    local _, sr = unpack(vim.fn.getpos("."))
+    local sr = vim.fn.line('.')
     line_start = sr
     line_end = sr
   end
 
   local comment_parts = M.make_comment_parts()
-  -- format only on selected lines
   local lines = vim.api.nvim_buf_get_lines(bufnr, line_start - 1, line_end, false)
-  -- core
   Util.toggle_comment(lines, 1, #lines, { comment_parts.left, comment_parts.right })
   vim.api.nvim_buf_set_lines(bufnr, line_start - 1, line_end, false, lines)
 end
