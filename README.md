@@ -99,7 +99,7 @@ function test(a, /*b*/, c) {}
 ## TODO
 
 - [ ] can not print lua message when selecting multi-lines in visiual mode
-- [ ] single line toggle are not working right
+- [ ] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, 具体看下是否有 单行的处理的逻辑)
 - [ ] support setup config(like disable, custom comment string)
 - [ ] rename module to "JustComment"
 - [ ] json file comment not right like coc.json

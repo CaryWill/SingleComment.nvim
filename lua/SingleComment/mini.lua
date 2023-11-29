@@ -61,7 +61,7 @@ local H = {}
 ---@usage `require('mini.comment').setup({})` (replace `{}` with your `config` table)
 MiniComment.setup = function(config)
   -- Export module
-  _G.__MiniComment = MiniComment
+  _G.MiniComment = MiniComment
 
   -- Setup config
   config = H.setup_config(config)
