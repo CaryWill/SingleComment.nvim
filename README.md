@@ -101,11 +101,11 @@ function test(a, /*b*/, c) {}
 - [ ] can not print lua message when selecting multi-lines in visiual mode
 - [ ] single line toggle are not working right
 - [ ] support setup config(like disable, custom comment string)
+- [ ] rename module to "JustComment"
 
 ## What not support
 
 1. 10gc, ...
-2. neovim version > 0.9
 
 ## Refs
 
