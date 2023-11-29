@@ -70,6 +70,7 @@ I just copied this part of logic from mini.comment plugin.
 ## TODO
 
 - [ ] can not print lua message when selecting multi-lines in visiual mode
+- [ ] single line toggle are not working right
 
 ## Refs
 
