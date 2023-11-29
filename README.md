@@ -102,6 +102,11 @@ function test(a, /*b*/, c) {}
 - [ ] single line toggle are not working right
 - [ ] support setup config(like disable, custom comment string)
 
+## What not support
+
+1. 10gc, ...
+2. neovim version > 0.9
+
 ## Refs
 
 1. [test](https://github.com/nvim-lua/plenary.nvim/blob/master/TESTS_README.md)
