@@ -74,6 +74,20 @@ if it's already formated like this, then comment on each line, since most plugin
       </div>
 ```
 
+### blank lines between lines
+
+```jsx
+    const a = 123;
+
+    const b = 123;
+```
+
+### support inline comment
+
+```jsx
+function test(a, /*b*/, c) {}
+```
+
 ## Goal
 
 - [x] comment jsx when more than 1 line is selected no matter where the cursor is
@@ -86,6 +100,7 @@ if it's already formated like this, then comment on each line, since most plugin
 
 - [ ] can not print lua message when selecting multi-lines in visiual mode
 - [ ] single line toggle are not working right
+- [ ] support setup config(like disable, custom comment string)
 
 ## Refs
 

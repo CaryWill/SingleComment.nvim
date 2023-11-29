@@ -97,3 +97,10 @@ describe("magic chars", function()
     assert.equals(match2 == nil, false)
   end)
 end)
+
+describe("misc", function()
+  it("_G usage", function()
+    _G.test = function() return "this is test function" end
+    assert.equals("this is test function", test())
+  end)
+end)
