@@ -1,12 +1,75 @@
-# Goal
+Most code are copied from mini.comment and SingleComment repo. Thanks for the great work.
 
-1. comment jsx when more than 1 line is selected no matter where the cursor is
-2. auto switch comment mode, Comment and BlockComment, unified into one
-3. can not print lua message when selecting multi-lines in visiual mode
-4. need test lua multi-lines
-5. 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
-6. see if i can unify just using original repo
-7. add space after comment
+# Motivation
+
+I found most plugins that working with react are commenting on eaching line instead of just comment
+on the first and last line when available.
+
+SingleComment plugin seems working on it, but it fails to do so when comment on react files like,
+
+```jsx
+  render() {
+    const a = 123;
+    const b = 123;
+    return (
+      <div>
+        <span>123</span>
+        <span>123</span>
+        <span>123</span>
+        <span>123</span>
+      </div>
+    );
+  }
+```
+
+what i want is like this,
+
+```jsx
+  render() {
+    const a = 123;
+    const b = 123;
+    return (
+      <div>
+        <span>123</span>
+        {/*<span>123</span>
+           <span>123</span>
+           <span>123</span>*/}
+      </div>
+    );
+  }
+```
+
+instead of this,
+
+```jsx
+  render() {
+    const a = 123;
+    const b = 123;
+    return (
+      <div>
+        <span>123</span>
+        {/*<span>123</span>*/}
+        {/*<span>123</span>*/}
+        {/*<span>123</span>*/}
+      </div>
+    );
+  }
+```
+
+Since i cannot found out why i cannot get the right comment string using ts_comment_string plugin,
+I just copied this part of logic from mini.comment plugin.
+
+## Goal
+
+- [x] comment jsx when more than 1 line is selected no matter where the cursor is
+- [ ] need test lua file multi-lines
+- [ ] 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
+- [x] see if i can unify just using original repo
+- [ ] add space after comment
+
+## TODO
+
+- [ ] can not print lua message when selecting multi-lines in visiual mode
 
 ## Refs
 
