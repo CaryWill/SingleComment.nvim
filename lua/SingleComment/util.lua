@@ -66,15 +66,22 @@ function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
   if sr == nil then sr = 1 end
   if er == nil then er = #lines end
 
-  for i = sr, er do
-    if i == sr then
+  if unescaped_left_chars and unescaped_right_chars ~= "" then
+    for i = sr, er do
+      if i == sr then
+        lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
+      elseif i == er then
+        lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
+        -- restore indent
+        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
+      else
+        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
+      end
+    end
+  else
+    -- uncomment on each line when right_chars are missing
+    for i = sr, er do
       lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
-    elseif i == er then
-      lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
-      -- restore indent
-      lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
-    else
-      lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
     end
   end
 
