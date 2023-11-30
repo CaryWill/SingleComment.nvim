@@ -102,7 +102,7 @@ function test(a, /*b*/, c) {}
 - [ ] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, 具体看下是否有 单行的处理的逻辑)
 - [ ] support setup config(like disable, custom comment string)
 - [ ] rename module to "JustComment"
-- [ ] json file comment not right like coc.json
+- [ ] json file comment not right like coc.json(json file 好像本来就不能添加 comment 的)
 
 ## What not support
 
