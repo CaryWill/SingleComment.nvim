@@ -121,6 +121,7 @@ function test(a, /*b*/, c) {}
 - [ ] support setup config(like disable, custom comment string)
 - [ ] rename module to "JustComment"
 - [x] json file comment not right like coc.json(yeah, actually json file type doesnt support comment)
+- [ ] comment then uncomment should made file remain unchanged, why i need to save the file again
 
 ## What not support
 
