@@ -5,7 +5,7 @@ Most code are copied from mini.comment and SingleComment repo. Thanks for the gr
 I found most plugins that working with react are commenting on eaching line instead of just comment
 on the first and last line when available.
 
-SingleComment plugin seems working on it, but it fails to do so when comment on react files like,
+SingleComment plugin seems working, but it fails to do so when comment on react files like,
 
 ```jsx
   render() {
