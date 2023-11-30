@@ -1,63 +1,123 @@
-local Util = require "SingleComment.util"
 local M = {}
 
-M.setup = function()
-  _G.__MiniComment = M
-
-  vim.keymap.set("n", "gcc", function() return M.operator() .. '_' end, { expr = true })
-  -- Using `:<c-u>` instead of `<cmd>` as latter results into executing before
-  -- proper update of `'<` and `'>` marks which is needed to work correctly.
-  vim.keymap.set("x", "gc", [[:<c-u>lua __MiniComment.operator('visual')<cr>]], {})
+-- default keep indent
+function M.insert_at_start(str, unescaped_chars)
+  vim.g.chars = unescaped_chars
+  local indent = str:match("^%s*")
+  local unindented = str:sub(#indent + 1, #str)
+  local result = indent .. unescaped_chars .. unindented
+  return result
 end
 
-M.operator = function(mode)
-  -- single line comment
-  if mode == nil then
-    vim.o.operatorfunc = 'v:lua.__MiniComment.operator'
-    return 'g@'
+-- default not keep indent
+function M.insert_at_end(str, unescaped_chars, keep_indent, left_padding)
+  if keep_indent then
+    return left_padding .. str .. unescaped_chars
+  else
+    return str .. unescaped_chars
+  end
+end
+
+function M.remove_from_start(str, unescaped_chars)
+  local indent = str:match("^%s*")
+  local escaped_chars = vim.pesc(unescaped_chars)
+  return str:gsub(indent .. escaped_chars, indent)
+end
+
+function M.remove_from_end(str, unescaped_chars)
+  local escaped_chars = vim.pesc(unescaped_chars)
+  if not str:find(escaped_chars .. "$") then
+    return str
+  end
+  return str:sub(1, #str - #unescaped_chars)
+end
+
+-- syntax sugar 🍬
+-- 1. if both left_chars & right_chars exists then only comment on first and last line
+-- 2. if right_chars are missing then comment on each line
+-- 3. keep indent
+function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescaped_right_chars)
+  if sr == nil then sr = 1 end
+  if er == nil then er = #lines end
+
+  if unescaped_left_chars and unescaped_right_chars ~= "" then
+    local indent = string.rep(" ", #unescaped_left_chars)
+    for i = sr, er do
+      if i == sr then
+        -- comment only on first line
+        if sr == er then
+          lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
+        end
+        lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
+      elseif i == er then
+        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars, true, indent)
+      else
+        lines[i] = indent .. lines[i]
+      end
+    end
+  else
+    -- comment on each line when right_chars are missing
+    for i = sr, er do
+      if sr == er then
+        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
+      end
+      lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
+    end
   end
 
-  local mark_left, mark_right = '[', ']'
-  if mode == 'visual' then
-    mark_left, mark_right = '<', '>'
+  return lines
+end
+
+function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescaped_right_chars)
+  if sr == nil then sr = 1 end
+  if er == nil then er = #lines end
+
+  if unescaped_left_chars and unescaped_right_chars ~= "" then
+    for i = sr, er do
+      if i == sr then
+        if sr == er then
+          lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
+        end
+        lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
+      elseif i == er then
+        lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
+        -- restore indent
+        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
+      else
+        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
+      end
+    end
+  else
+    -- uncomment on each line when right_chars are missing
+    for i = sr, er do
+      if sr == er then
+        lines[i] = M.remove_from_start(lines[i], unescaped_right_chars)
+      end
+      lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
+    end
   end
 
-  local line_left, col_left = unpack(vim.api.nvim_buf_get_mark(0, mark_left))
-  local line_right, col_right = unpack(vim.api.nvim_buf_get_mark(0, mark_right))
-
-  if (line_left > line_right) or (line_left == line_right and col_left > col_right) then return end
-  -- Use `vim.cmd()` wrapper to allow usage of `lockmarks` command, because raw
-  -- execution deletes marks in region (due to `vim.api.nvim_buf_set_lines()`).
-  vim.cmd(string.format(
-    [[lockmarks lua __MiniComment.toggle_lines(%d, %d)]],
-    line_left,
-    line_right
-  ))
-  return ''
+  return lines
 end
 
-M.toggle_lines = function(line_start, line_end)
-  local bufnr = vim.api.nvim_get_current_buf()
-  if line_start == nil and line_end == nil then
-    local sr = vim.fn.line('.')
-    line_start = sr
-    line_end = sr
+function M.tableSubsetByRange(originalTable, a, b)
+  local subset = {}
+  for i = a, b do
+    subset[i - a + 1] = originalTable[i]
   end
-
-  local comment_parts = M.make_comment_parts()
-  local lines = vim.api.nvim_buf_get_lines(bufnr, line_start - 1, line_end, false)
-  Util.toggle_comment(lines, 1, #lines, { comment_parts.left, comment_parts.right })
-  vim.api.nvim_buf_set_lines(bufnr, line_start - 1, line_end, false, lines)
+  return subset
 end
 
-M.make_comment_parts = function()
-  local cs = require('ts_context_commentstring').calculate_commentstring() or vim.bo.commentstring
-
-  -- Assumed structure of 'commentstring':
-  -- <space> <left> <'%s'> <right> <space>
-  -- So this extracts parts without surrounding whitespace
-  local left, right = cs:match('^%s*(.*)%%s(.-)%s*$')
-  return { left = left, right = right }
+function M.toggle_comment(lines, sr, er, comment)
+  if (lines[sr]:find(vim.pesc(comment[1]))) then
+    -- uncomment it
+    M.remove_comment_multiline(lines, sr, er, comment[1], comment[2])
+  else
+    -- comment it
+    M.insert_comment_multiline(lines, sr, er, comment[1], comment[2])
+  end
+  return lines
 end
 
+-- find('^%s*$')
 return M

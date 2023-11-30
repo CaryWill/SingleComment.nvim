@@ -35,6 +35,7 @@ end
 -- syntax sugar 🍬
 -- 1. if both left_chars & right_chars exists then only comment on first and last line
 -- 2. if right_chars are missing then comment on each line
+-- 3. keep indent
 function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescaped_right_chars)
   if sr == nil then sr = 1 end
   if er == nil then er = #lines end
@@ -44,8 +45,10 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
     for i = sr, er do
       if i == sr then
         -- comment only on first line
+        if sr == er then
+          lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
+        end
         lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
-        -- keep indent
       elseif i == er then
         lines[i] = M.insert_at_end(lines[i], unescaped_right_chars, true, indent)
       else
@@ -55,6 +58,9 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
   else
     -- comment on each line when right_chars are missing
     for i = sr, er do
+      if sr == er then
+        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
+      end
       lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
     end
   end
@@ -69,6 +75,9 @@ function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
   if unescaped_left_chars and unescaped_right_chars ~= "" then
     for i = sr, er do
       if i == sr then
+        if sr == er then
+          lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
+        end
         lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
       elseif i == er then
         lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
@@ -81,6 +90,9 @@ function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
   else
     -- uncomment on each line when right_chars are missing
     for i = sr, er do
+      if sr == er then
+        lines[i] = M.remove_from_start(lines[i], unescaped_right_chars)
+      end
       lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
     end
   end
