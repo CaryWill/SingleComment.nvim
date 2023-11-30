@@ -109,8 +109,8 @@ function test(a, /*b*/, c) {}
 ## Goal
 
 - [x] comment jsx when more than 1 line is selected no matter where the cursor is
-- [ ] need test lua file multi-lines
-- [ ] 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
+- [x] need test lua file multi-lines
+- [ ] 发现visual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
 - [x] see if i can unify just using original repo
 - [x] add space after comment
 
@@ -122,6 +122,8 @@ function test(a, /*b*/, c) {}
 - [ ] rename module to "JustComment"
 - [x] json file comment not right like coc.json(yeah, actually json file type doesnt support comment)
 - [ ] comment then uncomment should made file remain unchanged, why i need to save the file again
+- [x] jsx comment like in vscode
+- [ ] ignore blank line
 
 ## What not support
 
