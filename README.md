@@ -39,6 +39,24 @@ what i want is like this,
   }
 ```
 
+while well, vscode is like this, no additional indent for the following lines
+
+```jsx
+  render() {
+    const a = 123;
+    const b = 123;
+    return (
+      <div>
+        <span>123</span>
+        {/* <span>123</span>
+        <span>123</span>
+        <span>123</span> */}
+      </div>
+    );
+  }
+```
+
+
 instead of this,
 
 ```jsx
@@ -94,15 +112,15 @@ function test(a, /*b*/, c) {}
 - [ ] need test lua file multi-lines
 - [ ] 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
 - [x] see if i can unify just using original repo
-- [ ] add space after comment
+- [x] add space after comment
 
 ## TODO
 
 - [ ] can not print lua message when selecting multi-lines in visiual mode
-- [ ] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, 具体看下是否有 单行的处理的逻辑)
+- [x] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, yes it is)
 - [ ] support setup config(like disable, custom comment string)
 - [ ] rename module to "JustComment"
-- [ ] json file comment not right like coc.json(json file 好像本来就不能添加 comment 的)
+- [x] json file comment not right like coc.json(yeah, actually json file type doesnt support comment)
 
 ## What not support
 
