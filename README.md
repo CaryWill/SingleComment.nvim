@@ -106,6 +106,18 @@ if it's already formated like this, then comment on each line, since most plugin
 function test(a, /*b*/, c) {}
 ```
 
+这样的有点问题
+```jsx
+  const qrCodeProps = {
+    value,
+    size: size - (token.paddingSM + token.lineWidth) * 2,
+    level: errorLevel,
+    bgColor,
+    fgColor: color,
+    imageSettings: icon ? imageSettings : undefined,
+  };
+```
+
 ## Goal
 
 - [x] comment jsx when more than 1 line is selected no matter where the cursor is
