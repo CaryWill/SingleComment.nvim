@@ -106,7 +106,8 @@ if it's already formated like this, then comment on each line, since most plugin
 function test(a, /*b*/, c) {}
 ```
 
-这样的有点问题
+### mutiline block
+
 ```jsx
   const qrCodeProps = {
     value,
@@ -131,7 +132,6 @@ function test(a, /*b*/, c) {}
 - [ ] can not print lua message when selecting multi-lines in visiual mode
 - [x] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, yes it is)
 - [ ] support setup config(like disable, custom comment string)
-- [ ] rename module to "JustComment"
 - [x] json file comment not right like coc.json(yeah, actually json file type doesnt support comment)
 
 ## What not support

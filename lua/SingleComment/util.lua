@@ -1,9 +1,9 @@
 local M = {}
 
 -- default keep indent
-function M.insert_at_start(str, unescaped_chars)
+function M.insert_at_start(str, unescaped_chars, _indent)
   vim.g.chars = unescaped_chars
-  local indent = str:match("^%s*")
+  local indent = _indent or str:match("^%s*")
   local unindented = str:sub(#indent + 1, #str)
   local result = indent .. unescaped_chars .. unindented
   return result
@@ -61,7 +61,7 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
       if sr == er then
         lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
       end
-      lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
+      lines[i] = M.insert_at_start(lines[i], unescaped_left_chars, lines[sr]:match("^%s*"))
     end
   end
 
@@ -119,5 +119,4 @@ function M.toggle_comment(lines, sr, er, comment)
   return lines
 end
 
--- find('^%s*$')
 return M

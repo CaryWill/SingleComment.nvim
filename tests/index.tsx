@@ -8,6 +8,16 @@ class App extends Component {
   render() {
     const a = 123;
     const b = 123;
+
+    const qrCodeProps = {
+      value: 12,
+      size: 12,
+      level: 12,
+      bgColor: 12,
+      fgColor: 12,
+      imageSettings: undefined,
+    };
+
     return (
       <div>
         <span>123</span>
