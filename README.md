@@ -122,7 +122,7 @@ function test(a, /*b*/, c) {}
 ## Goal
 
 - [x] comment jsx when more than 1 line is selected no matter where the cursor is
-- [ ] need test lua file multi-lines
+- [x] need test lua file multi-lines
 - [ ] 发现vissual 打印不出来可能是被覆盖了，所以我直接写变量到全局，然后自己手动打印
 - [x] see if i can unify just using original repo
 - [x] add space after comment

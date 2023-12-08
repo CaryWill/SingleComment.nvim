@@ -61,7 +61,9 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
       if sr == er then
         lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
       end
-      lines[i] = M.insert_at_start(lines[i], unescaped_left_chars, lines[sr]:match("^%s*"))
+      if #lines[i] > 0 then
+        lines[i] = M.insert_at_start(lines[i], unescaped_left_chars, lines[sr]:match("^%s*"))
+      end
     end
   end
 

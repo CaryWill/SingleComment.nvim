@@ -9,6 +9,8 @@ class App extends Component {
     const a = 123;
     const b = 123;
 
+    const c = 123;
+
     const qrCodeProps = {
       value: 12,
       size: 12,
