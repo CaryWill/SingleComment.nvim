@@ -5,7 +5,7 @@ Most code are copied from mini.comment and SingleComment repo. Thanks for the gr
 I found most plugins that working with react are commenting on eaching line instead of just comment
 on the first and last line when available.
 
-SingleComment plugin seems working on it, but it fails to do so when comment on react files like,
+SingleComment plugin seems working, but it fails to do so when comment on react files like,
 
 ```jsx
   render() {
@@ -133,6 +133,9 @@ function test(a, /*b*/, c) {}
 - [x] single line toggle are not working right(right comment part missing, i guess it's because of toggle_lines impl, yes it is)
 - [ ] support setup config(like disable, custom comment string)
 - [x] json file comment not right like coc.json(yeah, actually json file type doesnt support comment)
+- [ ] comment then uncomment should made file remain unchanged, why i need to save the file again
+- [x] jsx comment like in vscode
+- [ ] ignore blank line
 
 ## What not support
 

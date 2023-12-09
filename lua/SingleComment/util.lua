@@ -41,7 +41,6 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
   if er == nil then er = #lines end
 
   if unescaped_left_chars and unescaped_right_chars ~= "" then
-    local indent = string.rep(" ", #unescaped_left_chars)
     for i = sr, er do
       if i == sr then
         -- comment only on first line
@@ -50,9 +49,9 @@ function M.insert_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
         end
         lines[i] = M.insert_at_start(lines[i], unescaped_left_chars)
       elseif i == er then
-        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars, true, indent)
+        lines[i] = M.insert_at_end(lines[i], unescaped_right_chars)
       else
-        lines[i] = indent .. lines[i]
+        lines[i] = lines[i]
       end
     end
   else
@@ -83,10 +82,6 @@ function M.remove_comment_multiline(lines, sr, er, unescaped_left_chars, unescap
         lines[i] = M.remove_from_start(lines[i], unescaped_left_chars)
       elseif i == er then
         lines[i] = M.remove_from_end(lines[i], unescaped_right_chars)
-        -- restore indent
-        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
-      else
-        lines[i] = lines[i]:sub(#unescaped_left_chars + 1, #lines[i])
       end
     end
   else
