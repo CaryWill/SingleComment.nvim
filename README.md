@@ -137,6 +137,13 @@ function test(a, /*b*/, c) {}
 - [x] jsx comment like in vscode
 - [ ] ignore blank line
 
+
+- [ ] bug
+
+```lua
+        fuzzy = true,                   -- false will only do exact matching
+```
+
 ## What not support
 
 1. 10gc, ...
